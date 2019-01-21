@@ -53,6 +53,10 @@ void TheModel::load_data(const char* filename)
     data = Data(filename);
 }
 
+void TheModel::from_prior(DNest4::RNG& rng)
+{
+
+}
 
 
 } // namespace

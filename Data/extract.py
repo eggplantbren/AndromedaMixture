@@ -54,8 +54,8 @@ theta = theta*np.pi/180.0
 
 # Save to text file
 data = np.empty((len(R), 5))
-data[:,0] = R
-data[:,1] = theta
+data[:,0] = R*np.cos(theta)
+data[:,1] = R*np.sin(theta)
 data[:,2] = v
 data[:,3] = sig_v
 data[:,4] = classification
@@ -64,6 +64,6 @@ np.savetxt("data.txt", data)
 # Plot some stuff
 import matplotlib.pyplot as plt
 
-plt.plot(R, theta, "o")
+plt.plot(R*np.cos(theta), R*np.sin(theta), "o")
 plt.show()
 

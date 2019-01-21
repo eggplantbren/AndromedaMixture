@@ -21,7 +21,7 @@ std::ostream& operator << (std::ostream& out,
 class Data
 {
     private:
-        std::vector<double> rs, thetas;
+        std::vector<double> xs, ys;
         std::vector<double> vs, sig_vs;
         std::vector<Classification> classifications;
 
@@ -49,8 +49,8 @@ Data::Data(const char* filename)
     }
 
     // Clear any existing data
-    rs.clear();
-    thetas.clear();
+    xs.clear();
+    ys.clear();
     vs.clear();
     sig_vs.clear();
     classifications.clear();
@@ -58,8 +58,8 @@ Data::Data(const char* filename)
     double a, b, c, d, e;
     while(fin >> a && fin >> b && fin >> c && fin >> d && fin >> e)
     {
-        rs.push_back(a);
-        thetas.push_back(b);
+        xs.push_back(a);
+        ys.push_back(b);
         vs.push_back(c);
         sig_vs.push_back(d);
         if(e == 1.0)
@@ -71,7 +71,7 @@ Data::Data(const char* filename)
     }
     fin.close();
 
-    std::cout << "# Loaded " << rs.size() << " data points from file ";
+    std::cout << "# Loaded " << xs.size() << " data points from file ";
     std::cout << filename << '.' << std::endl;
 }
 
