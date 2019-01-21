@@ -3,9 +3,13 @@
 
 using namespace AndromedaMixture;
 
-int main()
+int main(int argc, char** argv)
 {
+    // Load the data
     TheModel::load_data("Data/data.txt");
+
+    // Run DNest4
+    DNest4::start<TheModel>(argc, argv);
 
     return 0;
 }

@@ -7,9 +7,8 @@ ALL = $(FLAGS) $(INCLUDE) $(OPTIM) $(WARN)
 
 default:
 	$(CXX) $(ALL) -c main.cpp
-	$(CXX) -pthread -L$(DNEST4_PATH) -o main main.o -lpthread -dnest4
+	$(CXX) -pthread -L$(DNEST4_PATH)/DNest4/code -o main main.o -lpthread -ldnest4
 	rm -f main.o
-
 
 tidy:
 	clang-tidy main.cpp -- $(INCLUDE)
