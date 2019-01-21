@@ -26,11 +26,18 @@ class Data
         std::vector<Classification> classifications;
 
     public:
+
+        Data();
         Data(const char* filename);
 };
 
 
 /* IMPLEMENTATIONS FOLLOW */
+
+Data::Data()
+{
+
+}
 
 Data::Data(const char* filename)
 {
@@ -40,6 +47,13 @@ Data::Data(const char* filename)
         std::cerr << "Couldn't open data file " << filename << "." << std::endl;
         return;
     }
+
+    // Clear any existing data
+    rs.clear();
+    thetas.clear();
+    vs.clear();
+    sig_vs.clear();
+    classifications.clear();
 
     double a, b, c, d, e;
     while(fin >> a && fin >> b && fin >> c && fin >> d && fin >> e)
