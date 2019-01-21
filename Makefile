@@ -1,13 +1,13 @@
 CXX = g++
 FLAGS = -std=c++17
-INCLUDE = -I .
+INCLUDE = -I $(DNEST4_PATH)
 OPTIM = -O2 -g
 WARN = -Wall -Wextra -pedantic
-ALL = $(FLAGS) $(OPTIM) $(WARN)
+ALL = $(FLAGS) $(INCLUDE) $(OPTIM) $(WARN)
 
 default:
 	$(CXX) $(ALL) -c main.cpp
-	$(CXX) -o main main.o
+	$(CXX) -pthread -L$(DNEST4_PATH) -o main main.o -lpthread -dnest4
 	rm -f main.o
 
 

@@ -2,6 +2,7 @@
 #define AndromedaMixture_TheModel_hpp
 
 #include "Data.hpp"
+#include "DNest4/code/DNest4.h"
 #include <memory>
 
 namespace AndromedaMixture
@@ -19,8 +20,27 @@ class TheModel
         // Load the dataset
         static void load_data(const char* filename);
 
-    
+    private:
 
+        // Amplitude for rotation
+        double A;
+
+        // Axis
+        double theta0;
+
+        // Velocity dispersion
+        double sig;
+
+        // Characteristic radius for velocity dispersion
+        double R0;
+
+    public:
+
+        void from_prior(DNest4::RNG& rng);
+        double perturb(DNest4::RNG& rng);
+        double log_likelihood() const;
+        void print(std::ostream& out) const;
+        std::string description() const;
 
 };
 
