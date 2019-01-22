@@ -124,12 +124,20 @@ double TheModel::log_likelihood() const
 
     for(size_t i=0; i<data.xs.size(); ++i)
     {
-	    double sth = sin(theta0[0]);
-	    double cth = cos(theta0[0]);
+        int k = 0;
+
+        if(data.classifications[i] == Classification::substructure)
+            k = 1;
+        if(data.classifications[i] == Classification::no_substructure)
+            k = 0;
+        // TODO: Handle ambiguous cases
+
+	    double sth = sin(theta0[k]);
+	    double cth = cos(theta0[k]);
 	    double dist = data.xs[i]*sth - data.ys[i]*cth;
 
         // Expected velocity based on distance from the line
-        double mu_v = A[0]*dist;
+        double mu_v = A[k]*dist;
 
         // Distance from centre
         double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
