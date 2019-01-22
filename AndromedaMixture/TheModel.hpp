@@ -68,15 +68,15 @@ void TheModel::load_data(const char* filename)
 
 void TheModel::from_prior(DNest4::RNG& rng)
 {
-    // TODO: have a more informative prior saying the two As are within
+    // The two As are within
     // an order of magnitude or so of each other
-    for(size_t i=0; i<A.size(); ++i)
-    {
-        A[i] = cauchy.generate(rng);
+    A[0] = cauchy.generate(rng);
+    A[1] = A[0] + rng.randn();
+    for(int i=0; i<2; ++i)
         A[i] = exp(A[i]);
 
-        theta0[i] = 2.0*M_PI*rng.rand();
-    }
+    theta0[0] = 2.0*M_PI*rng.rand();
+    theta0[1] = 2.0*M_PI*rng.rand();
 
     sigma0 = cauchy.generate(rng);
     sigma0 = exp(sigma0);
@@ -88,22 +88,33 @@ double TheModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(4);
+    int which = rng.rand_int(5);
 
     if(which == 0)
     {
-        int k = rng.rand_int(A.size());
-        A[k] = log(A[k]);
-        logH += cauchy.perturb(A[k], rng);
-        A[k] = exp(A[k]);
+        A[0] = log(A[0]);
+        A[1] = log(A[1]);
+        double old = A[0];
+        logH += cauchy.perturb(A[0], rng);
+        A[1] += A[0] - old;
+        A[0] = exp(A[0]);
+        A[1] = exp(A[1]);
     }
     else if(which == 1)
+    {
+        A[1] = log(A[1]);
+        logH -= -0.5*pow(A[1] - log(A[0]), 2);
+        A[1] += rng.randh();
+        logH += -0.5*pow(A[1] - log(A[0]), 2);
+        A[1] = exp(A[1]);
+    }
+    else if(which == 2)
     {
         int k = rng.rand_int(A.size());
         theta0[k] += 2.0*M_PI*rng.randh();
         DNest4::wrap(theta0[k], 0.0, 2.0*M_PI);
     }
-    else if(which == 2)
+    else if(which == 3)
     {
         sigma0 = log(sigma0);
         logH += cauchy.perturb(sigma0, rng);
