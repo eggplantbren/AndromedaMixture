@@ -64,6 +64,11 @@ np.savetxt("data.txt", data)
 # Plot some stuff
 import matplotlib.pyplot as plt
 
-plt.plot(R*np.cos(theta), R*np.sin(theta), "o")
+away = data[:,2] > 0.0
+towards = data[:,2] <= 0.0
+plt.scatter(data[away,0], data[away,1], marker="o", color="r", alpha=0.5,
+                s=np.abs(data[away, 2]))
+plt.scatter(data[towards,0], data[towards,1], marker="o", color="b", alpha=0.5,
+                s=np.abs(data[towards, 2]))
 plt.show()
 
