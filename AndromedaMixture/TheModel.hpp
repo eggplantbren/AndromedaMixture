@@ -120,7 +120,7 @@ double TheModel::log_likelihood() const
 
         // Velocity dispersion (+) Prior SD of measurement error
         double var_tot = data.sig_vs[i]*data.sig_vs[i]
-                            + sigma0*sigma0*pow(Rsq/(R0*R0), 2.0*gamma);
+                            + sigma0*sigma0*pow(Rsq/(R0*R0), gamma);
 
         logL += -0.5*log(2.0*M_PI*var_tot)
                         -0.5*pow(data.vs[i] - mu_v, 2)/var_tot;
