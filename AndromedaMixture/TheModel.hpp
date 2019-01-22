@@ -4,6 +4,7 @@
 #include "Data.hpp"
 #include "DNest4/code/DNest4.h"
 #include <memory>
+#include <vector>
 
 namespace AndromedaMixture
 {
@@ -25,11 +26,11 @@ class TheModel
 
     private:
 
-        // Amplitude for rotation
-        double A;
+        // Amplitudes for rotation
+        std::vector<double> A;
 
         // Axis for the rotation
-        double theta0;
+        std::vector<double> theta0;
 
         // Velocity dispersion parameters
         double sigma0, gamma;
@@ -39,6 +40,7 @@ class TheModel
 
     public:
 
+        TheModel();
         void from_prior(DNest4::RNG& rng);
         double perturb(DNest4::RNG& rng);
         double log_likelihood() const;
@@ -52,6 +54,13 @@ class TheModel
 Data TheModel::data;
 DNest4::TruncatedCauchy TheModel::cauchy(0.0, 5.0, -100.0, 100.0);
 
+TheModel::TheModel()
+:A(2)
+,theta0(2)
+{
+
+}
+
 void TheModel::load_data(const char* filename)
 {
     data = Data(filename);
@@ -59,10 +68,15 @@ void TheModel::load_data(const char* filename)
 
 void TheModel::from_prior(DNest4::RNG& rng)
 {
-    A = cauchy.generate(rng);
-    A = exp(A);
+    // TODO: have a more informative prior saying the two As are within
+    // an order of magnitude or so of each other
+    for(size_t i=0; i<A.size(); ++i)
+    {
+        A[i] = cauchy.generate(rng);
+        A[i] = exp(A[i]);
 
-    theta0 = 2.0*M_PI*rng.rand();
+        theta0[i] = 2.0*M_PI*rng.rand();
+    }
 
     sigma0 = cauchy.generate(rng);
     sigma0 = exp(sigma0);
@@ -78,14 +92,16 @@ double TheModel::perturb(DNest4::RNG& rng)
 
     if(which == 0)
     {
-        A = log(A);
-        logH += cauchy.perturb(A, rng);
-        A = exp(A);
+        int k = rng.rand_int(A.size());
+        A[k] = log(A[k]);
+        logH += cauchy.perturb(A[k], rng);
+        A[k] = exp(A[k]);
     }
     else if(which == 1)
     {
-        theta0 += 2.0*M_PI*rng.randh();
-        DNest4::wrap(theta0, 0.0, 2.0*M_PI);
+        int k = rng.rand_int(A.size());
+        theta0[k] += 2.0*M_PI*rng.randh();
+        DNest4::wrap(theta0[k], 0.0, 2.0*M_PI);
     }
     else if(which == 2)
     {
@@ -108,12 +124,12 @@ double TheModel::log_likelihood() const
 
     for(size_t i=0; i<data.xs.size(); ++i)
     {
-	    double sth = sin(theta0);
-	    double cth = cos(theta0);
+	    double sth = sin(theta0[0]);
+	    double cth = cos(theta0[0]);
 	    double dist = data.xs[i]*sth - data.ys[i]*cth;
 
         // Expected velocity based on distance from the line
-        double mu_v = A*dist;
+        double mu_v = A[0]*dist;
 
         // Distance from centre
         double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
@@ -133,13 +149,15 @@ double TheModel::log_likelihood() const
 
 void TheModel::print(std::ostream& out) const
 {
-    out << A << ' ' << theta0 << ' ' << sigma0 << ' ' << gamma;
+    out << A[0] << ' ' << A[1] << ' ';
+    out << theta0[0] << ' ' << theta0[1] << ' ';
+    out << sigma0 << ' ' << gamma;
 }
 
 
 std::string TheModel::description() const
 {
-    return "A, theta0, sigma0, gamma";
+    return "A[0], A[1], theta0[0], theta0[1], sigma0, gamma";
 }
 
 
