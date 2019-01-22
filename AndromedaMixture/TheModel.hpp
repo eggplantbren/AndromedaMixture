@@ -35,6 +35,12 @@ class TheModel
         // Velocity dispersion parameters
         double sigma0, gamma;
 
+        // Uniform latent variables for ambiguous clusters
+        std::vector<double> us;
+
+        // Threshold value that counts it as a substructure
+        double substructure_threshold;
+
         // Characteristic radius for velocity dispersion
         static constexpr double R0 = 30.0;
 
@@ -57,6 +63,7 @@ DNest4::TruncatedCauchy TheModel::cauchy(0.0, 5.0, -100.0, 100.0);
 TheModel::TheModel()
 :A(2)
 ,theta0(2)
+,us(data.xs.size())
 {
 
 }
@@ -82,13 +89,17 @@ void TheModel::from_prior(DNest4::RNG& rng)
     sigma0 = exp(sigma0);
 
     gamma = -3.0*rng.rand();
+
+    for(double& u: us)
+        u = rng.rand();
+    substructure_threshold = rng.rand();
 }
 
 double TheModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(5);
+    int which = rng.rand_int(7);
 
     if(which == 0)
     {
@@ -120,10 +131,21 @@ double TheModel::perturb(DNest4::RNG& rng)
         logH += cauchy.perturb(sigma0, rng);
         sigma0 = exp(sigma0);
     }
-    else
+    else if(which == 4)
     {
         gamma += 3.0*rng.randh();
         DNest4::wrap(gamma, -3.0, 0.0);
+    }
+    else if(which == 5)
+    {
+        int k = rng.rand_int(us.size());
+        us[k] += rng.randh();
+        DNest4::wrap(us[k], 0.0, 1.0);
+    }
+    else
+    {
+        substructure_threshold += rng.randh();
+        DNest4::wrap(substructure_threshold, 0.0, 1.0);
     }
 
     return logH;
@@ -136,12 +158,15 @@ double TheModel::log_likelihood() const
     for(size_t i=0; i<data.xs.size(); ++i)
     {
         int k = 0;
-
         if(data.classifications[i] == Classification::substructure)
             k = 1;
         if(data.classifications[i] == Classification::no_substructure)
             k = 0;
-        // TODO: Handle ambiguous cases
+        if(data.classifications[i] == Classification::ambiguous &&
+            us[i] < substructure_threshold)
+        {
+            k = 1;
+        }
 
 	    double sth = sin(theta0[k]);
 	    double cth = cos(theta0[k]);
@@ -170,13 +195,13 @@ void TheModel::print(std::ostream& out) const
 {
     out << A[0] << ' ' << A[1] << ' ';
     out << theta0[0] << ' ' << theta0[1] << ' ';
-    out << sigma0 << ' ' << gamma;
+    out << sigma0 << ' ' << gamma << ' ' << substructure_threshold;
 }
 
 
 std::string TheModel::description() const
 {
-    return "A[0], A[1], theta0[0], theta0[1], sigma0, gamma";
+    return "A[0], A[1], theta0[0], theta0[1], sigma0, gamma, substructure_threshold";
 }
 
 
