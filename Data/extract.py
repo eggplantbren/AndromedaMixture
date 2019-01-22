@@ -49,8 +49,8 @@ v = np.array(v)
 sig_v = np.array(sig_v)
 classification = np.array(classification)
 
-# Angle to radians
-theta = theta*np.pi/180.0
+# Angle to radians and rotate 90 degrees
+theta = (theta+ 90.0)*np.pi/180.0
 
 # Save to text file
 data = np.empty((len(R), 5))
