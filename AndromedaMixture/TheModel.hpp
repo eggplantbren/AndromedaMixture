@@ -67,7 +67,7 @@ void TheModel::from_prior(DNest4::RNG& rng)
     sigma0 = cauchy.generate(rng);
     sigma0 = exp(sigma0);
 
-    gamma = 3.0*rng.rand();
+    gamma = -3.0*rng.rand();
 }
 
 double TheModel::perturb(DNest4::RNG& rng)
@@ -96,7 +96,7 @@ double TheModel::perturb(DNest4::RNG& rng)
     else
     {
         gamma += 3.0*rng.randh();
-        DNest4::wrap(gamma, 0.0, 3.0);
+        DNest4::wrap(gamma, -3.0, 0.0);
     }
 
     return logH;
@@ -106,26 +106,14 @@ double TheModel::log_likelihood() const
 {
     double logL = 0.0;
 
-    double tan_theta0 = tan(theta0);
-
     for(size_t i=0; i<data.xs.size(); ++i)
     {
-        // Closest point on the line
-        double x_line = (data.xs[i] + data.ys[i]*tan_theta0) /
-                                        (1.0 + tan_theta0*tan_theta0);
-        double y_line = x_line*tan_theta0;
-
-        // Displacement from the closest point on the line
-        double dist_x = x_line - data.xs[i];
-        double dist_y = y_line - data.ys[i];
-        double dist = sqrt(dist_x*dist_x + dist_y*dist_y);
+	    double sth = sin(theta0);
+	    double cth = cos(theta0);
+	    double dist = data.xs[i]*sth - data.ys[i]*cth;
 
         // Expected velocity based on distance from the line
         double mu_v = A*dist;
-
-        // Sign of velocity
-        if(dist_y < 0.0)
-            mu_v *= -1.0;
 
         // Distance from centre
         double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
