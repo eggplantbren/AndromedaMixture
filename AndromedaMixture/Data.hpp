@@ -29,6 +29,8 @@ class Data
 
         Data();
         Data(const char* filename);
+
+        friend class TheModel;
 };
 
 

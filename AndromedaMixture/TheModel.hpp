@@ -98,6 +98,22 @@ double TheModel::perturb(DNest4::RNG& rng)
 double TheModel::log_likelihood() const
 {
     double logL = 0.0;
+
+    for(size_t i=0; i<data.xs.size(); ++i)
+    {
+        // Distance from centre
+        double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
+
+        // Total variance
+        double var_tot = sig*sig + data.sig_vs[i]*data.sig_vs[i];
+
+        logL += -0.5*log(2.0*M_PI*var_tot)
+                -0.5*pow(data.vs[i], 2)/var_tot;
+
+        // Distance from rotation axis
+//        double mu_v = A*sqrt(Rsq);
+    }
+
     return logL;
 }
 
