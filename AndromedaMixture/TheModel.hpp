@@ -115,13 +115,18 @@ double TheModel::log_likelihood() const
                                         (1.0 + tan_theta0*tan_theta0);
         double y_line = x_line*tan_theta0;
 
-        // Distance to the closest point on the line
-        double dist_to_line = sqrt(pow(x_line - data.xs[i], 2) +
-                                   pow(y_line - data.ys[i], 2));
+        // Displacement from the closest point on the line
+        double dist_x = x_line - data.xs[i];
+        double dist_y = y_line - data.ys[i];
+        double dist = sqrt(dist_x*dist_x + dist_y*dist_y);
 
         // Expected velocity based on distance from the line
-        double mu_v = A*dist_to_line;
-        
+        double mu_v = A*dist;
+
+        // Sign of velocity
+        if(dist_y < 0.0)
+            mu_v *= -1.0;
+
         // Distance from centre
         double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
 
