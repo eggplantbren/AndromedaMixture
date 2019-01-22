@@ -82,8 +82,8 @@ void TheModel::from_prior(DNest4::RNG& rng)
     for(int i=0; i<2; ++i)
         A[i] = exp(A[i]);
 
-    theta0[0] = 2.0*M_PI*rng.rand();
-    theta0[1] = 2.0*M_PI*rng.rand();
+    theta0[0] = -M_PI + 2.0*M_PI*rng.rand();
+    theta0[1] = -M_PI + 2.0*M_PI*rng.rand();
 
     sigma0 = cauchy.generate(rng);
     sigma0 = exp(sigma0);
@@ -123,7 +123,7 @@ double TheModel::perturb(DNest4::RNG& rng)
     {
         int k = rng.rand_int(A.size());
         theta0[k] += 2.0*M_PI*rng.randh();
-        DNest4::wrap(theta0[k], 0.0, 2.0*M_PI);
+        DNest4::wrap(theta0[k], -M_PI, M_PI);
     }
     else if(which == 3)
     {
@@ -162,8 +162,8 @@ double TheModel::log_likelihood() const
             k = 1;
         if(data.classifications[i] == Classification::no_substructure)
             k = 0;
-        if(data.classifications[i] == Classification::ambiguous &&
-            us[i] < substructure_threshold)
+        if((data.classifications[i] == Classification::ambiguous) &&
+            (us[i] < substructure_threshold))
         {
             k = 1;
         }
@@ -194,7 +194,7 @@ double TheModel::log_likelihood() const
 void TheModel::print(std::ostream& out) const
 {
     out << A[0] << ' ' << A[1] << ' ';
-    out << theta0[0] << ' ' << theta0[1] << ' ';
+    out << theta0[0]*180.0/M_PI << ' ' << theta0[1]*180.0/M_PI << ' ';
     out << sigma0 << ' ' << gamma << ' ' << substructure_threshold;
 }
 
