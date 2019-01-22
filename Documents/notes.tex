@@ -1,0 +1,52 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[left=2cm, right=2cm, bottom=3cm, top=2cm]{geometry}
+\usepackage{natbib}
+\usepackage{microtype}
+
+\title{Notes}
+\author{Brendon J. Brewer}
+\date{}
+
+\begin{document}
+\maketitle
+
+%\abstract{\noindent Abstract}
+
+% Need this after the abstract
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+\section{Distance of a point from a line}
+Let the point be $(x_0, y_0)$ and the line (passing through the origin) be
+given by
+\begin{align}
+y = x \tan \theta.
+\end{align}
+The squared distance between the point and a point on the line is
+\begin{align}
+\ell^2 &= \left(x - x_0\right)^2 +
+       \left(x\tan\theta - y_0\right)^2.
+\end{align}
+This distance is minimised where the derivative is zero, i.e.,
+\begin{align}
+\frac{d\ell^2}{dx} &= 2\left(x - x_0\right) +
+                      2\tan\theta\left(x\tan\theta - y_0\right) \\
+                   &= 0.
+\end{align}
+Solving for $x$ gives
+\begin{align}
+x &= \frac{x_0 + y_0\tan\theta}{1 + \tan^2\theta}.
+\end{align}
+
+
+
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
+
