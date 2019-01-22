@@ -3,7 +3,7 @@ import dnest4.classic as dn4
 import matplotlib.pyplot as plt
 import numpy as np
 
-dn4.postprocess()
+dn4.postprocess(rng_seed=0)
 
 # Do corner plot
 posterior_sample = dn4.my_loadtxt("posterior_sample.txt")

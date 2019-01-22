@@ -3,6 +3,7 @@
 
 #include "Data.hpp"
 #include "DNest4/code/DNest4.h"
+#include <iomanip>
 #include <memory>
 #include <vector>
 
@@ -193,6 +194,7 @@ double TheModel::log_likelihood() const
 
 void TheModel::print(std::ostream& out) const
 {
+    out << std::setprecision(10);
     out << A[0] << ' ' << A[1] << ' ';
     out << theta0[0]*180.0/M_PI << ' ' << theta0[1]*180.0/M_PI << ' ';
     out << sigma0 << ' ' << gamma << ' ' << substructure_threshold;
