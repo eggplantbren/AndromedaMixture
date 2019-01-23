@@ -5,6 +5,7 @@
 #include "DNest4/code/DNest4.h"
 #include <iomanip>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 namespace AndromedaMixture
@@ -34,7 +35,8 @@ class TheModel
         std::vector<double> theta0;
 
         // Velocity dispersion parameters
-        double sigma0, gamma;
+        std::vector<double> sigma0;
+        std::vector<double> gamma;
 
         // Uniform latent variables for ambiguous clusters
         std::vector<double> us;
@@ -64,6 +66,8 @@ DNest4::TruncatedCauchy TheModel::cauchy(0.0, 5.0, -100.0, 100.0);
 TheModel::TheModel()
 :A(2)
 ,theta0(2)
+,sigma0(2)
+,gamma(2)
 ,us(data.xs.size())
 {
 
@@ -86,10 +90,15 @@ void TheModel::from_prior(DNest4::RNG& rng)
     theta0[0] = -M_PI + 2.0*M_PI*rng.rand();
     theta0[1] = -M_PI + 2.0*M_PI*rng.rand();
 
-    sigma0 = cauchy.generate(rng);
-    sigma0 = exp(sigma0);
+    // The two sigmas are within
+    // an order of magnitude or so of each other
+    sigma0[0] = cauchy.generate(rng);
+    sigma0[1] = sigma0[0] + rng.randn();
+    for(int i=0; i<2; ++i)
+        sigma0[i] = exp(sigma0[i]);
 
-    gamma = -3.0*rng.rand();
+    gamma[0] = -3.0*rng.rand();
+    gamma[1] = -3.0*rng.rand();
 
     for(double& u: us)
         u = rng.rand();
@@ -100,7 +109,7 @@ double TheModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(7);
+    int which = rng.rand_int(8);
 
     if(which == 0)
     {
@@ -128,16 +137,29 @@ double TheModel::perturb(DNest4::RNG& rng)
     }
     else if(which == 3)
     {
-        sigma0 = log(sigma0);
-        logH += cauchy.perturb(sigma0, rng);
-        sigma0 = exp(sigma0);
+        sigma0[0] = log(sigma0[0]);
+        sigma0[1] = log(sigma0[1]);
+        double old = sigma0[0];
+        logH += cauchy.perturb(sigma0[0], rng);
+        sigma0[1] += sigma0[0] - old;
+        sigma0[0] = exp(sigma0[0]);
+        sigma0[1] = exp(sigma0[1]);
     }
     else if(which == 4)
     {
-        gamma += 3.0*rng.randh();
-        DNest4::wrap(gamma, -3.0, 0.0);
+        sigma0[1] = log(sigma0[1]);
+        logH -= -0.5*pow(sigma0[1] - log(sigma0[0]), 2);
+        sigma0[1] += rng.randh();
+        logH += -0.5*pow(sigma0[1] - log(sigma0[0]), 2);
+        sigma0[1] = exp(sigma0[1]);
     }
     else if(which == 5)
+    {
+        int k = rng.rand_int(A.size());
+        gamma[k] += 3.0*rng.randh();
+        DNest4::wrap(gamma[k], -3.0, 0.0);
+    }
+    else if(which == 6)
     {
         int k = rng.rand_int(us.size());
         us[k] += rng.randh();
@@ -181,7 +203,7 @@ double TheModel::log_likelihood() const
 
         // Velocity dispersion (+) Prior SD of measurement error
         double var_tot = data.sig_vs[i]*data.sig_vs[i]
-                            + sigma0*sigma0*pow(Rsq/(R0*R0), gamma);
+                            + sigma0[k]*sigma0[k]*pow(Rsq/(R0*R0), gamma[k]);
 
         logL += -0.5*log(2.0*M_PI*var_tot)
                         -0.5*pow(data.vs[i] - mu_v, 2)/var_tot;
@@ -197,13 +219,17 @@ void TheModel::print(std::ostream& out) const
     out << std::setprecision(10);
     out << A[0] << ' ' << A[1] << ' ';
     out << theta0[0]*180.0/M_PI << ' ' << theta0[1]*180.0/M_PI << ' ';
-    out << sigma0 << ' ' << gamma << ' ' << substructure_threshold;
+    out << sigma0[0] << ' ' << sigma0[1] << ' ';
+    out << gamma[0] << ' ' << gamma[1] << ' ' << substructure_threshold;
 }
 
 
 std::string TheModel::description() const
 {
-    return "A[0], A[1], theta0[0], theta0[1], sigma0, gamma, substructure_threshold";
+    std::stringstream ss;
+    ss << "A[0], A[1], theta0[0], theta0[1], sigma0[0], sigma0[1], ";
+    ss << "gamma[0], gamma[1], substructure_threshold";
+    return ss.str();
 }
 
 
