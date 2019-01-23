@@ -8,10 +8,7 @@ dn4.postprocess(rng_seed=0)
 # Do corner plot
 posterior_sample = dn4.my_loadtxt("posterior_sample.txt")
 colnames = dn4.load_column_names("posterior_sample.txt")["colnames"]
-corner.corner(posterior_sample,
-                labels=["A_nosubs", "A_subs",
-                        "theta0_nosubs", "theta0_subs",
-                        "sigma0", "gamma", "subs_thresh"])
+corner.corner(posterior_sample, labels=colnames)
 plt.savefig("corner.png")
 plt.show()
 
