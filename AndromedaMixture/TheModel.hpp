@@ -198,6 +198,10 @@ double TheModel::log_likelihood() const
         // Expected velocity based on distance from the line
         double mu_v = A[k]*dist;
 
+        // The other model
+//        double theta = atan2(data.ys[i], data.xs[i]);
+//        double mu_v = A[k]*sin(theta - theta0[k]);
+
         // Distance from centre
         double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
 
