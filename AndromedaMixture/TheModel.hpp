@@ -34,6 +34,9 @@ class TheModel
         // Axis for the rotation
         std::vector<double> theta0;
 
+        // A length scale parameter
+        std::vector<double> L;
+
         // Velocity dispersion parameters
         std::vector<double> sigma0;
         std::vector<double> gamma;
@@ -66,6 +69,7 @@ DNest4::TruncatedCauchy TheModel::cauchy(0.0, 5.0, -100.0, 100.0);
 TheModel::TheModel()
 :A(2)
 ,theta0(2)
+,L(2)
 ,sigma0(2)
 ,gamma(2)
 ,us(data.xs.size())
@@ -90,6 +94,9 @@ void TheModel::from_prior(DNest4::RNG& rng)
     theta0[0] = -M_PI + 2.0*M_PI*rng.rand();
     theta0[1] = -M_PI + 2.0*M_PI*rng.rand();
 
+    L[0] = exp(log(1E-3*R0) + log(1E3)*rng.rand());
+    L[1] = exp(log(1E-3*R0) + log(1E3)*rng.rand());
+
     // The two sigmas are within
     // an order of magnitude or so of each other
     sigma0[0] = cauchy.generate(rng);
@@ -109,7 +116,7 @@ double TheModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(8);
+    int which = rng.rand_int(9);
 
     if(which == 0)
     {
@@ -137,6 +144,14 @@ double TheModel::perturb(DNest4::RNG& rng)
     }
     else if(which == 3)
     {
+        int k = rng.rand_int(A.size());
+        L[k] = log(L[k]);
+        L[k] += log(1E3)*rng.randh();
+        DNest4::wrap(L[k], log(1E-3*R0), log(R0));
+        L[k] = exp(L[k]);
+    }
+    else if(which == 4)
+    {
         sigma0[0] = log(sigma0[0]);
         sigma0[1] = log(sigma0[1]);
         double old = sigma0[0];
@@ -145,7 +160,7 @@ double TheModel::perturb(DNest4::RNG& rng)
         sigma0[0] = exp(sigma0[0]);
         sigma0[1] = exp(sigma0[1]);
     }
-    else if(which == 4)
+    else if(which == 5)
     {
         sigma0[1] = log(sigma0[1]);
         logH -= -0.5*pow(sigma0[1] - log(sigma0[0]), 2);
@@ -153,13 +168,13 @@ double TheModel::perturb(DNest4::RNG& rng)
         logH += -0.5*pow(sigma0[1] - log(sigma0[0]), 2);
         sigma0[1] = exp(sigma0[1]);
     }
-    else if(which == 5)
+    else if(which == 6)
     {
         int k = rng.rand_int(A.size());
         gamma[k] += 3.0*rng.randh();
         DNest4::wrap(gamma[k], -3.0, 0.0);
     }
-    else if(which == 6)
+    else if(which == 7)
     {
         int k = rng.rand_int(us.size());
         us[k] += rng.randh();
@@ -196,11 +211,15 @@ double TheModel::log_likelihood() const
 	    double dist = data.xs[i]*sth - data.ys[i]*cth;
 
         // Expected velocity based on distance from the line
+        // Geraint's model
         double mu_v = A[k]*dist;
 
-        // The other model
+        // Veljanoski's model
 //        double theta = atan2(data.ys[i], data.xs[i]);
 //        double mu_v = A[k]*sin(theta - theta0[k]);
+
+        // Geraint and Brendon's sigmoid model
+//        double mu_v = A[k]*tanh(dist/L[k]);
 
         // Distance from centre
         double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
@@ -223,6 +242,7 @@ void TheModel::print(std::ostream& out) const
     out << std::setprecision(10);
     out << A[0] << ' ' << A[1] << ' ';
     out << theta0[0]*180.0/M_PI << ' ' << theta0[1]*180.0/M_PI << ' ';
+    out << L[0] << ' ' << L[1] << ' ';
     out << sigma0[0] << ' ' << sigma0[1] << ' ';
     out << gamma[0] << ' ' << gamma[1] << ' ' << substructure_threshold;
 }
@@ -231,7 +251,7 @@ void TheModel::print(std::ostream& out) const
 std::string TheModel::description() const
 {
     std::stringstream ss;
-    ss << "A[0], A[1], theta0[0], theta0[1], sigma0[0], sigma0[1], ";
+    ss << "A[0], A[1], theta0[0], theta0[1], L[0], L[1], sigma0[0], sigma0[1], ";
     ss << "gamma[0], gamma[1], substructure_threshold";
     return ss.str();
 }
