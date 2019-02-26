@@ -14,7 +14,9 @@ plt.show()
 
 
 
-# Corner plot for V2
+
+## Corner plot for V2
+#posterior_sample = posterior_sample[:, [0, 1, 2, 3, 6, 7, 8, 9, 10]]
 #corner.corner(posterior_sample,
 #              labels=["$A_0$ (km/s)", "$A_1$ (km/s)", "$\\theta_0^0$ (deg)", "$\\theta_0^1$ (deg)",
 #                      "$\\sigma_0^0$ (km/s)", "$\\sigma_0^1$ (km/s)", "$\\gamma_0$",
@@ -22,5 +24,5 @@ plt.show()
 #              plot_contours=False, plot_density=False,
 #                data_kwargs={"alpha": 0.15, "markersize": 0.75})
 #plt.savefig("corner.png", dpi=240)
-##plt.show()
+#plt.show()
 
