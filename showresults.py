@@ -12,3 +12,15 @@ corner.corner(posterior_sample, labels=colnames)
 plt.savefig("corner.png")
 plt.show()
 
+
+
+# Corner plot for V2
+#corner.corner(posterior_sample,
+#              labels=["$A_0$ (km/s)", "$A_1$ (km/s)", "$\\theta_0^0$ (deg)", "$\\theta_0^1$ (deg)",
+#                      "$\\sigma_0^0$ (km/s)", "$\\sigma_0^1$ (km/s)", "$\\gamma_0$",
+#                      "$\\gamma_1$", "$p_{\\rm subs}$"],
+#              plot_contours=False, plot_density=False,
+#                data_kwargs={"alpha": 0.15, "markersize": 0.75})
+#plt.savefig("corner.png", dpi=240)
+##plt.show()
+
