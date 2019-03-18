@@ -212,11 +212,11 @@ double TheModel::log_likelihood() const
 
         // Expected velocity based on distance from the line
         // Geraint's model
-        double mu_v = A[k]*dist;
+//        double mu_v = A[k]*dist;
 
         // Veljanoski's model
-//        double theta = atan2(data.ys[i], data.xs[i]);
-//        double mu_v = A[k]*sin(theta - theta0[k]);
+        double theta = atan2(data.ys[i], data.xs[i]);
+        double mu_v = A[k]*sin(theta - theta0[k]);
 
         // Geraint and Brendon's sigmoid model
 //        double mu_v = A[k]*tanh(dist/L[k]);
@@ -226,7 +226,7 @@ double TheModel::log_likelihood() const
 
         // Velocity dispersion (+) Prior SD of measurement error
         double var_tot = data.sig_vs[i]*data.sig_vs[i]
-                          + sigma0[k]*sigma0[k]*pow(Rsq/(R0*R0), 2.0*gamma[k]);
+                          + sigma0[k]*sigma0[k]*pow(Rsq/(R0*R0), gamma[k]);
 
         logL += -0.5*log(2.0*M_PI*var_tot)
                         -0.5*pow(data.vs[i] - mu_v, 2)/var_tot;
