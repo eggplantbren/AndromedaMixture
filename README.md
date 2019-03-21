@@ -9,7 +9,7 @@ It was used to do the model comparison and
 parameter estimation calculations for our
 forthcoming paper
 _Kinematic evidence for two dominant accretion epochs in the assembly of the Andromeda galaxy_
-by Mackey et al.
+by Dougal Mackey, Geraint F. Lewis, Brendon J. Brewer, and collaborators.
 
 
 Instructions to Reproduce Results in the Paper
