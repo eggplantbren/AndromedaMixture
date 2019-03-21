@@ -55,5 +55,6 @@ Changing the rotation model
 ===========================
 
 The default rotation model is V2 from the paper. Modify lines 13 and 14 of `main.cpp`
-to change this. To exactly reproduce the paper results, don't forget to run with
+and re-compile by running `make` to change this.
+To exactly reproduce the paper results, don't forget to run with
 a different RNG seed (as in Table 3).
