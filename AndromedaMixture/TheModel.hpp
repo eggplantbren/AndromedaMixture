@@ -11,6 +11,14 @@
 namespace AndromedaMixture
 {
 
+
+// Represent the rotation model chosen
+enum class RotationModel
+{
+    V, S, F
+};
+
+
 class TheModel
 {
     private:
@@ -21,10 +29,17 @@ class TheModel
         // A Cauchy distribution
         static DNest4::TruncatedCauchy cauchy;
 
+        // Rotation model and number of components
+        static RotationModel rotation_model;
+        static int num_components;
+
     public:
 
         // Load the dataset
         static void load_data(const char* filename);
+
+        // Set the rotation model
+        static void set_rotation_model(const RotationModel& rm, int nc);
 
     private:
 
@@ -63,8 +78,18 @@ class TheModel
 
 /* IMPLEMENTATIONS FOLLOW */
 
+// Initial values of static variables
 Data TheModel::data;
 DNest4::TruncatedCauchy TheModel::cauchy(0.0, 5.0, -100.0, 100.0);
+RotationModel TheModel::rotation_model = RotationModel::V;
+int TheModel::num_components = 2;
+
+void TheModel::set_rotation_model(const RotationModel& rm, int nc)
+{
+    rotation_model = rm;
+    num_components = nc;
+    assert(num_components == 1 || num_components == 2);
+}
 
 TheModel::TheModel()
 :A(2)
@@ -195,31 +220,44 @@ double TheModel::log_likelihood() const
 
     for(size_t i=0; i<data.xs.size(); ++i)
     {
+        // Flag - use component zero or component one for this GC?
         int k = 0;
-        if(data.classifications[i] == Classification::substructure)
-            k = 1;
-        if(data.classifications[i] == Classification::no_substructure)
-            k = 0;
-        if((data.classifications[i] == Classification::ambiguous) &&
-            (us[i] < substructure_threshold))
+        if(num_components == 2)
         {
-            k = 1;
+            if(data.classifications[i] == Classification::substructure)
+                k = 1;
+            if(data.classifications[i] == Classification::no_substructure)
+                k = 0;
+            if((data.classifications[i] == Classification::ambiguous) &&
+                (us[i] < substructure_threshold))
+            {
+                k = 1;
+            }
         }
 
 	    double sth = sin(theta0[k]);
 	    double cth = cos(theta0[k]);
 	    double dist = data.xs[i]*sth - data.ys[i]*cth;
 
-        // Expected velocity based on distance from the line
-        // Geraint's model
-//        double mu_v = A[k]*dist;
+        double mu_v = 0.0;
 
-        // Veljanoski's model
-        double theta = atan2(data.ys[i], data.xs[i]);
-        double mu_v = A[k]*sin(theta - theta0[k]);
-
-        // Geraint and Brendon's sigmoid model
-//        double mu_v = A[k]*tanh(dist/L[k]);
+        if(rotation_model == RotationModel::V)
+        {
+            // Veljanoski's model
+            double theta = atan2(data.ys[i], data.xs[i]);
+            mu_v = A[k]*sin(theta - theta0[k]);
+        }
+        else if(rotation_model == RotationModel::S)
+        {
+            // Expected velocity based on distance from the line
+            // Geraint's model
+            mu_v = A[k]*dist;
+        }
+        else
+        {
+            // Geraint and Brendon's sigmoid model
+            mu_v = A[k]*tanh(dist/L[k]);
+        }
 
         // Distance from centre
         double Rsq = pow(data.xs[i], 2) + pow(data.ys[i], 2);
