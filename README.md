@@ -46,5 +46,14 @@ Once that's finished (it produces 100,000 saved particles), run the postprocessi
 python showresults.py
 ```
 
-This will produce three DNest4 plots and output the marginal likelihood to the screen.
+This will produce three DNest4 plots and output the marginal likelihood to the screen
+and posterior samples to `posterior_sample.txt` (one parameter per column, see the header
+line for the meaning of each column).
 After closing those plots, it will produce the corner plot and save it to corner.png.
+
+Changing the rotation model
+===========================
+
+The default rotation model is V2 from the paper. Modify lines 13 and 14 of `main.cpp`
+to change this. To exactly reproduce the paper results, don't forget to run with
+a different RNG seed (as in Table 3).
