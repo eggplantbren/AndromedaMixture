@@ -10,3 +10,41 @@ parameter estimation calculations for our
 forthcoming paper
 _Kinematic evidence for two dominant accretion epochs in the assembly of the Andromeda galaxy_
 by Mackey et al.
+
+
+Instructions to Reproduce Results in the Paper
+==============================================
+
+You will require all the dependencies of [DNest4](https://github.com/eggplantbren/DNest4),
+plus [corner.py](https://github.com/dfm/corner.py).
+First, clone this repo recursively and compile the C++:
+
+```
+git clone --recursive https://github.com/eggplantbren/AndromedaMixture
+cd AndromedaMixture
+make
+```
+
+Install the DNest4 Python package (unless you already have it), like this (Mac users, see the DNest4 manual for something extra you need to do):
+
+```
+cd DNest4/python
+python setup.py install
+```
+
+Now go back to the directory containing the binary, and run DNest4 with ten threads
+and a random number seed of 1 (this will run model V2, the favoured model):
+
+```
+cd ../..
+./main -t 10 -s 1
+```
+
+Once that's finished (it produces 100,000 saved particles), run the postprocessing script:
+
+```
+python showresults.py
+```
+
+This will produce three DNest4 plots and output the marginal likelihood to the screen.
+After closing those plots, it will produce the corner plot and save it to corner.png.
