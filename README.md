@@ -55,6 +55,13 @@ Changing the rotation model
 ===========================
 
 The default rotation model is V2 from the paper. Modify lines 13 and 14 of `main.cpp`
-and re-compile by running `make` to change this.
-To exactly reproduce the paper results, don't forget to run with
-a different RNG seed (as in Table 3).
+and re-compile by running `make` to use a different rotation model. For example, to
+use model S1, these lines should be modified to  
+
+```
+constexpr RotationModel rotation_model = RotationModel::S;
+constexpr int num_components = 1;
+```
+
+To exactly reproduce the results from the paper, don't forget to use the
+correct random number seed from Table 3.
