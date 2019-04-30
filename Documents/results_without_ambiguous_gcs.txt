@@ -1,0 +1,10 @@
+These are just log(Z)s. F is slightly favoured over V, but two-component models are still favoured
+conditional on any shape.
+
+S1: -365.7844272340452
+S2: -361.8144425843379
+V1: -361.32778083310654
+V2: -355.1089978883016
+F1: -362.3907260498551
+F2: -353.6725124709433
+
