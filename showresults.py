@@ -39,11 +39,11 @@ axes = np.array(fig.axes).reshape((9, 9))
 # Set limits manually for theta0 and theta1
 for i in range(0, 2):
     axes[2, i].set_ylim([-180.0, 180.0])
-for i in range(3, 9):
+for i in range(2, 9):
     axes[i, 2].set_xlim([-180.0, 180.0])
 for i in range(0, 3):
     axes[3, i].set_ylim([-180.0, 180.0])
-for i in range(4, 9):
+for i in range(3, 9):
     axes[i, 3].set_xlim([-180.0, 180.0])
 
 
