@@ -8,7 +8,7 @@ released under the terms of the MIT license.
 It was used to do the model comparison and
 parameter estimation calculations for our
 forthcoming paper
-_Kinematic evidence for two dominant accretion epochs in the assembly of the Andromeda galaxy_
+_Kinematic evidence for two major accretion epochs in the assembly of the Andromeda galaxy_
 by Dougal Mackey, Geraint F. Lewis, Brendon J. Brewer, and collaborators.
 
 
