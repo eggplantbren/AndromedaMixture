@@ -2,7 +2,7 @@
 Extract the relevant parts from the data file.
 """
 
-f = open("table_final2.dat")
+f = open("table_final.dat")
 
 # Empty lists
 R = []
