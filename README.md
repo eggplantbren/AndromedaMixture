@@ -6,11 +6,12 @@ Mixture Model for Andromeda Globular Clusters
 This is free software
 released under the terms of the MIT license.
 It was used to do the model comparison and
-parameter estimation calculations for our
-forthcoming paper
-_Kinematic evidence for two major accretion epochs in the assembly of the Andromeda galaxy_
-by Dougal Mackey, Geraint F. Lewis, Brendon J. Brewer, and collaborators.
+parameter estimation calculations for the following paper
+(Nature, 2019, accepted):
 
+_Two major accretion epochs in M31 from two distinct populations of globular clusters_
+
+Dougal Mackey, Geraint F. Lewis, Brendon J. Brewer, Annette M. N. Ferguson, Jovan Veljanoski, Avon P. Huxor, Michelle L. M. Collins, Patrick Côté, Rodrigo A. Ibata, Mike J. Irwin, Nicolas Martin, Alan W. McConnachie, Jorge Peñarrubia, Nial Tanvir, Zhen Wan
 
 Instructions to Reproduce Results in the Paper
 ==============================================
