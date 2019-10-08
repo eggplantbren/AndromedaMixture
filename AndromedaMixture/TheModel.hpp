@@ -52,6 +52,9 @@ class TheModel
         // A length scale parameter
         std::vector<double> L;
 
+        // Constant velocity
+        double v0;
+
         // Velocity dispersion parameters
         std::vector<double> sigma;
         std::vector<double> gamma;
@@ -119,6 +122,8 @@ void TheModel::from_prior(DNest4::RNG& rng)
     phi[0] = -M_PI + 2.0*M_PI*rng.rand();
     phi[1] = -M_PI + 2.0*M_PI*rng.rand();
 
+    v0 = -100.0 + 200.0*rng.rand();
+
     L[0] = exp(log(1E-3*R0) + log(1E3)*rng.rand());
     L[1] = exp(log(1E-3*R0) + log(1E3)*rng.rand());
 
@@ -141,7 +146,7 @@ double TheModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(9);
+    int which = rng.rand_int(10);
 
     if(which == 0)
     {
@@ -205,10 +210,15 @@ double TheModel::perturb(DNest4::RNG& rng)
         us[k] += rng.randh();
         DNest4::wrap(us[k], 0.0, 1.0);
     }
-    else
+    else if(which == 8)
     {
         p_subs += rng.randh();
         DNest4::wrap(p_subs, 0.0, 1.0);
+    }
+    else
+    {
+        v0 += 200.0*rng.randh();
+        DNest4::wrap(v0, -100.0, 100.0);
     }
 
     return logH;
@@ -239,24 +249,24 @@ double TheModel::log_likelihood() const
 	    double cth = cos(phi[k]);
 	    double dist = data.xs[i]*sth - data.ys[i]*cth;
 
-        double mu_v = 0.0;
+        double mu_v = v0;
 
         if(rotation_model == RotationModel::V)
         {
             // Veljanoski's model
             double theta = atan2(data.ys[i], data.xs[i]);
-            mu_v = A[k]*sin(theta - phi[k]);
+            mu_v += A[k]*sin(theta - phi[k]);
         }
         else if(rotation_model == RotationModel::S)
         {
             // Expected velocity based on distance from the line
             // Geraint's model
-            mu_v = A[k]*dist;
+            mu_v += A[k]*dist;
         }
         else
         {
             // Geraint and Brendon's sigmoid model
-            mu_v = A[k]*tanh(dist/L[k]);
+            mu_v += A[k]*tanh(dist/L[k]);
         }
 
         // Distance from centre
