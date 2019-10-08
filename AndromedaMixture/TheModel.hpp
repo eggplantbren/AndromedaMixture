@@ -53,7 +53,7 @@ class TheModel
         std::vector<double> L;
 
         // Constant velocity
-        double v0;
+        std::vector<double> v0;
 
         // Velocity dispersion parameters
         std::vector<double> sigma;
@@ -98,6 +98,7 @@ TheModel::TheModel()
 :A(2)
 ,phi(2)
 ,L(2)
+,v0(2)
 ,sigma(2)
 ,gamma(2)
 ,us(data.xs.size())
@@ -122,7 +123,8 @@ void TheModel::from_prior(DNest4::RNG& rng)
     phi[0] = -M_PI + 2.0*M_PI*rng.rand();
     phi[1] = -M_PI + 2.0*M_PI*rng.rand();
 
-    v0 = -100.0 + 200.0*rng.rand();
+    v0[0] = -100.0 + 200.0*rng.rand();
+    v0[1] = v0[0] + 30*rng.randn();
 
     L[0] = exp(log(1E-3*R0) + log(1E3)*rng.rand());
     L[1] = exp(log(1E-3*R0) + log(1E3)*rng.rand());
@@ -146,7 +148,7 @@ double TheModel::perturb(DNest4::RNG& rng)
 {
     double logH = 0.0;
 
-    int which = rng.rand_int(10);
+    int which = rng.rand_int(11);
 
     if(which == 0)
     {
@@ -215,10 +217,18 @@ double TheModel::perturb(DNest4::RNG& rng)
         p_subs += rng.randh();
         DNest4::wrap(p_subs, 0.0, 1.0);
     }
+    else if(which == 9)
+    {
+        double old = v0[0];
+        v0[0] += 200.0*rng.randh();
+        DNest4::wrap(v0[0], -100.0, 100.0);
+        v0[1] += v0[0] - old;
+    }
     else
     {
-        v0 += 200.0*rng.randh();
-        DNest4::wrap(v0, -100.0, 100.0);
+        logH -= -0.5*pow((v0[1] - v0[0])/30.0, 2);
+        v0[1] += rng.randh();
+        logH += -0.5*pow((v0[1] - v0[0])/30.0, 2);
     }
 
     return logH;
@@ -249,7 +259,7 @@ double TheModel::log_likelihood() const
 	    double cth = cos(phi[k]);
 	    double dist = data.xs[i]*sth - data.ys[i]*cth;
 
-        double mu_v = v0;
+        double mu_v = v0[k];
 
         if(rotation_model == RotationModel::V)
         {
@@ -292,7 +302,8 @@ void TheModel::print(std::ostream& out) const
     out << phi[0]*180.0/M_PI << ' ' << phi[1]*180.0/M_PI << ' ';
     out << L[0] << ' ' << L[1] << ' ';
     out << sigma[0] << ' ' << sigma[1] << ' ';
-    out << gamma[0] << ' ' << gamma[1] << ' ' << p_subs;
+    out << gamma[0] << ' ' << gamma[1] << ' ' << p_subs << ' ';
+    out << v0[0] << ' ' << v0[1];
 }
 
 

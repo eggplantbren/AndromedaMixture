@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     TheModel::load_data("Data/data.txt");
 
     // Set the rotation model
-    constexpr RotationModel rotation_model = RotationModel::V;
+    constexpr RotationModel rotation_model = RotationModel::S;
     constexpr int num_components = 2;
     static_assert(num_components == 1 || num_components == 2);
     TheModel::set_rotation_model(rotation_model, num_components);
