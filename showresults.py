@@ -30,7 +30,7 @@ fig = corner.corner(posterior_sample,
                       "$\\sigma_0$ (km/s)", "$\\sigma_1$ (km/s)", "$\\gamma_0$",
                       "$\\gamma_1$", "$p_{\\rm subs}$"],
               plot_contours=False, plot_density=False,
-              data_kwargs={"alpha": 0.15, "markersize": 0.75},
+              data_kwargs={"alpha": 0.15, "ms": 0.75},
               label_kwargs=dict(fontsize=24))
 
 # Extract the axes
